@@ -135,6 +135,10 @@ case "${host}" in
         dbus_cygwin=yes
         dbus_unix=yes
         ;;
+    *-os2*)
+        dbus_os2=yes
+        dbus_unix=yes
+        ;;
     *)
         dbus_unix=yes
        ;;
@@ -174,6 +178,10 @@ if test "$dbus_cygwin" = yes; then
     AC_DEFINE(DBUS_CYGWIN,1,[Defined if we run on a cygwin API based system])
 fi
 
+if test "$dbus_os2" = yes; then
+    AC_DEFINE(DBUS_OS2,1,[Defined if we run on a OS/2 API based system])
+fi
+
 # For best security, assume that all non-Windows platforms can do
 # credentials-passing.
 AS_IF([test "$dbus_win" = yes],
@@ -185,6 +193,7 @@ AM_CONDITIONAL(DBUS_WIN, test "$dbus_win" = yes)
 AM_CONDITIONAL(DBUS_WINCE, test "$dbus_wince" = yes)
 AM_CONDITIONAL(DBUS_UNIX, test "$dbus_unix" = yes)
 AM_CONDITIONAL(DBUS_CYGWIN, test "$dbus_cygwin" = yes)
+AM_CONDITIONAL(DBUS_OS2, test "$dbus_os2" = yes)
 
 DBUS_STATIC_BUILD_CPPFLAGS=
 if test "x$enable_shared" = xno; then
@@ -733,6 +742,9 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#ifdef __OS2__
+#include <libcx/net.h>
+#endif
 ]], [[
 socklen_t foo;
 foo = 1;
