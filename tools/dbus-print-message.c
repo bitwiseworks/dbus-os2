@@ -29,6 +29,9 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
+#ifdef DBUS_OS2
+#include <netinet/in_systm.h>
+#endif
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
@@ -38,6 +41,10 @@
 #include "config.h"
 
 #include "tool-common.h"
+
+#ifdef DBUS_OS2
+#include <libcx/net.h>
+#endif
 
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
@@ -180,12 +187,20 @@ print_fd (int fd, int depth)
   struct stat statbuf = {0,};
   union {
       struct sockaddr sa;
+#ifndef DBUS_OS2
       struct sockaddr_storage storage;
+#endif
       struct sockaddr_un un;
       struct sockaddr_in ipv4;
+#ifndef DBUS_OS2
       struct sockaddr_in6 ipv6;
+#endif
   } addr, peer;
+#ifdef DBUS_OS2
+  char hostip[INET_ADDRSTRLEN];
+#else
   char hostip[INET6_ADDRSTRLEN];
+#endif
   socklen_t addrlen = sizeof (addr);
   socklen_t peerlen = sizeof (peer);
   int has_peer;
@@ -286,7 +301,7 @@ print_fd (int fd, int depth)
 
         break;
 
-#ifdef AF_INET6
+#if defined(AF_INET6) && !defined(DBUS_OS2)
       case AF_INET6:
         printf ("inet6\n");
         if (inet_ntop (AF_INET6, &addr.ipv6.sin6_addr, hostip, sizeof (hostip)))

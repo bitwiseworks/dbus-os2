@@ -74,6 +74,9 @@ _dbus_disable_crash_handling (void)
 #endif
 
 #ifdef HAVE_SYS_RESOURCE_H
+#ifdef DBUS_OS2
+#include <sys/types.h>
+#endif
 #include <sys/resource.h>
 #endif
 

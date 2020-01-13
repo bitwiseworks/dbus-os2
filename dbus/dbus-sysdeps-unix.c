@@ -59,6 +59,10 @@
 #include <grp.h>
 #include <arpa/inet.h>
 
+#ifdef __OS2__
+#include <libcx/net.h>
+#endif
+
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
@@ -1718,7 +1722,11 @@ _dbus_listen_tcp_socket (const char     *host,
           if (!port || !strcmp(port, "0"))
             {
               int result;
+#ifdef DBUS_OS2
+              struct sockaddr addr;
+#else
               struct sockaddr_storage addr;
+#endif
               socklen_t addrlen;
               char portbuf[50];
 
@@ -4635,7 +4643,9 @@ _dbus_socket_can_pass_unix_fd (DBusSocket fd)
 #ifdef SCM_RIGHTS
   union {
     struct sockaddr sa;
+#ifndef DBUS_OS2
     struct sockaddr_storage storage;
+#endif
     struct sockaddr_un un;
   } sa_buf;
 
@@ -4814,12 +4824,20 @@ _dbus_append_address_from_socket (DBusSocket  fd,
 {
   union {
       struct sockaddr sa;
+#ifndef DBUS_OS2
       struct sockaddr_storage storage;
+#endif
       struct sockaddr_un un;
       struct sockaddr_in ipv4;
+#ifndef DBUS_OS2
       struct sockaddr_in6 ipv6;
+#endif
   } socket;
+#ifdef DBUS_OS2
+  char hostip[INET_ADDRSTRLEN];
+#else
   char hostip[INET6_ADDRSTRLEN];
+#endif
   socklen_t size = sizeof (socket);
   DBusString path_str;
   const char *family_name = NULL;

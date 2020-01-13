@@ -804,9 +804,13 @@ _dbus_inet_sockaddr_to_string (const void *sockaddr_pointer,
   union
     {
       struct sockaddr sa;
+#ifndef DBUS_OS2
       struct sockaddr_storage storage;
+#endif
       struct sockaddr_in ipv4;
+#ifndef DBUS_OS2
       struct sockaddr_in6 ipv6;
+#endif
     } addr;
   int saved_errno;
 
@@ -839,7 +843,7 @@ _dbus_inet_sockaddr_to_string (const void *sockaddr_pointer,
 
         return FALSE;
 
-#ifdef AF_INET6
+#if defined(AF_INET6) && !defined(DBUS_OS2)
       case AF_INET6:
         if (inet_ntop (AF_INET6, &addr.ipv6.sin6_addr, string, string_len) != NULL)
           {
@@ -886,7 +890,11 @@ _dbus_set_error_with_inet_sockaddr (DBusError *error,
                                     const char *description,
                                     int saved_errno)
 {
+#ifdef DBUS_OS2
+  char string[INET_ADDRSTRLEN];
+#else
   char string[INET6_ADDRSTRLEN];
+#endif
   dbus_uint16_t port;
   const struct sockaddr *addr = sockaddr_pointer;
 
