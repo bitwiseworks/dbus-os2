@@ -94,7 +94,7 @@
 
 DBUS_BEGIN_DECLS
 
-#ifdef DBUS_WIN
+#if defined(DBUS_WIN) || defined(DBUS_OS2)
 #define _DBUS_PATH_SEPARATOR ";"
 #else
 #define _DBUS_PATH_SEPARATOR ":"

@@ -1437,7 +1437,7 @@ _dbus_get_standard_session_servicedirs (DBusList **dirs)
         goto oom;
     }
 
-  if (!_dbus_string_append (&servicedir_path, ":"))
+  if (!_dbus_string_append (&servicedir_path, _DBUS_PATH_SEPARATOR))
     goto oom;
 
   if (xdg_data_dirs != NULL)
@@ -1445,12 +1445,16 @@ _dbus_get_standard_session_servicedirs (DBusList **dirs)
       if (!_dbus_string_append (&servicedir_path, xdg_data_dirs))
         goto oom;
 
-      if (!_dbus_string_append (&servicedir_path, ":"))
+      if (!_dbus_string_append (&servicedir_path, _DBUS_PATH_SEPARATOR))
         goto oom;
     }
   else
     {
+#ifndef DBUS_OS2
       if (!_dbus_string_append (&servicedir_path, "/usr/local/share:/usr/share:"))
+#else
+      if (!_dbus_string_append (&servicedir_path, "/@unixroot/usr/local/share;/@unixroot/usr/share;"))
+#endif
         goto oom;
     }
 
@@ -1508,10 +1512,17 @@ _dbus_get_standard_system_servicedirs (DBusList **dirs)
    * be available.
    */
   static const char standard_search_path[] =
+#ifndef DBUS_OS2
     "/usr/local/share:"
     "/usr/share:"
     DBUS_DATADIR ":"
     "/lib";
+#else
+    "/@unixroot/usr/local/share;"
+    "/@unixroot/usr/share;"
+    DBUS_DATADIR ";"
+    "/@unixroot/lib";
+#endif
   DBusString servicedir_path;
 
   _dbus_string_init_const (&servicedir_path, standard_search_path);

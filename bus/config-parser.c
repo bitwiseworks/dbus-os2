@@ -3951,11 +3951,19 @@ out:
 #ifndef DBUS_WIN
 static const char *test_system_service_dir_matches[] = 
         {
+#ifndef DBUS_OS2
          "/usr/local/share/dbus-1/system-services",
          "/usr/share/dbus-1/system-services",
          DBUS_DATADIR"/dbus-1/system-services",
          "/lib/dbus-1/system-services",
          NULL
+#else
+         "/@unixroot/usr/local/share/dbus-1/system-services",
+         "/@unixroot/usr/share/dbus-1/system-services",
+         DBUS_DATADIR"/dbus-1/system-services",
+         "/@unixroot/lib/dbus-1/system-services",
+         NULL
+#endif
         };
 
 static dbus_bool_t
