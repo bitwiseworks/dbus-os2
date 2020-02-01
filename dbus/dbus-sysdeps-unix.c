@@ -24,6 +24,14 @@
 
 #include <config.h>
 
+#ifdef __OS2__
+#define OS2EMX_PLAIN_CHAR
+#define INCL_BASE
+#define INCL_PM
+#include <os2.h>
+#include <libcx/net.h>
+#endif
+
 #include "dbus-internals.h"
 #include "dbus-sysdeps.h"
 #include "dbus-sysdeps-unix.h"
@@ -58,10 +66,6 @@
 #include <netdb.h>
 #include <grp.h>
 #include <arpa/inet.h>
-
-#ifdef __OS2__
-#include <libcx/net.h>
-#endif
 
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
@@ -3356,6 +3360,7 @@ _dbus_sleep_milliseconds (int milliseconds)
  * @param error location to store reason for failure
  * @returns #TRUE on success, #FALSE on error
  */
+#ifndef DBUS_OS2
 dbus_bool_t
 _dbus_generate_random_bytes (DBusString *str,
                              int         n_bytes,
@@ -3405,6 +3410,97 @@ _dbus_generate_random_bytes (DBusString *str,
 
   return TRUE;
 }
+#else
+static BOOL clockTickTime(unsigned long *phigh, unsigned long *plow)
+{
+  APIRET rc = NO_ERROR;
+  QWORD qword = {0,0};
+
+  rc = DosTmrQueryTime(&qword);
+  if (rc != NO_ERROR)
+    return FALSE;
+
+  *phigh = qword.ulHi;
+  *plow  = qword.ulLo;
+
+  return TRUE;
+}
+
+dbus_bool_t
+_dbus_generate_random_bytes (DBusString *str,
+                             int         n_bytes,
+                             DBusError  *error)
+{
+  unsigned long high = 0;
+  unsigned long low  = 0;
+  clock_t val = 0;
+  int n_bytesToGo = n_bytes;
+  int n_bytesDone = 0;
+  int nBytes = 0;
+  time_t sTime;
+  int start;
+  char *data;
+
+  if (n_bytes <= 0)
+  {
+    errno = EINVAL;
+    dbus_set_error (error, _dbus_error_from_errno (errno),
+                    "n_bytes to short");
+    return FALSE;
+  }
+
+  start = _dbus_string_get_length (str);
+
+  if (!_dbus_string_lengthen (str, n_bytes))
+    {
+      errno = ENOMEM;
+      dbus_set_error (error, _dbus_error_from_errno (errno),
+                      "n_bytes to short");
+      return FALSE;
+    }
+
+  data = _dbus_string_get_data_len (str, start, n_bytes);
+
+  clockTickTime(&high, &low);
+
+  /* get the maximally changing bits first */
+  nBytes = sizeof(low) > n_bytesToGo ? n_bytesToGo : sizeof(low);
+  memcpy(data, &low, nBytes);
+  n_bytesDone += nBytes;
+  n_bytesToGo -= nBytes;
+
+  if (n_bytesToGo <= 0)
+    return TRUE;
+
+  nBytes = sizeof(high) > n_bytesToGo ? n_bytesToGo : sizeof(high);
+  memcpy(((char *)data) + n_bytesDone, &high, nBytes);
+  n_bytesDone += nBytes;
+  n_bytesToGo -= nBytes;
+
+  if (n_bytesToGo <= 0)
+    return TRUE;
+
+  /* get the number of milliseconds that have elapsed since application started */
+  val = clock();
+
+  nBytes = sizeof(val) > n_bytesToGo ? n_bytesToGo : sizeof(val);
+  memcpy(((char *)data) + n_bytesDone, &val, nBytes);
+  n_bytesDone += nBytes;
+  n_bytesToGo -= nBytes;
+
+  if (n_bytesToGo <= 0)
+    return TRUE;
+
+  /* get the time in seconds since midnight Jan 1, 1970 */
+  time(&sTime);
+  nBytes = sizeof(sTime) > n_bytesToGo ? n_bytesToGo : sizeof(sTime);
+  memcpy(((char *)data) + n_bytesDone, &sTime, nBytes);
+  n_bytesDone += nBytes;
+  _dbus_string_set_length (str, start + n_bytesDone);
+
+  return TRUE;
+}
+#endif
 
 /**
  * Exit the process, returning the given value.
