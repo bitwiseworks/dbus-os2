@@ -123,6 +123,7 @@ LT_LANG([Windows Resource])
 dbus_win=no
 dbus_cygwin=no
 dbus_unix=no
+dbus_os2=no
 case "${host}" in
     *-mingw32ce*)
         dbus_win=yes
@@ -1598,6 +1599,9 @@ AC_DEFINE_UNQUOTED(DBUS_TEST_LAUNCH_HELPER_BINARY, "$TEST_LAUNCH_HELPER_BINARY",
                    [Full path to the launch helper test program in the builddir])
 
 #### Find socket directories
+if test "x$dbus_os2" = xyes; then
+   DEFAULT_SOCKET_DIR=/socket
+else
 if ! test -z "$TMPDIR" ; then
    DEFAULT_SOCKET_DIR=$TMPDIR
 elif ! test -z "$TEMP" ; then
@@ -1606,6 +1610,7 @@ elif ! test -z "$TMP" ; then
    DEFAULT_SOCKET_DIR=$TMP
 else
    DEFAULT_SOCKET_DIR=/tmp
+fi
 fi
 
 DEFAULT_SOCKET_DIR=`echo $DEFAULT_SOCKET_DIR | sed 's/+/%2B/g'`
