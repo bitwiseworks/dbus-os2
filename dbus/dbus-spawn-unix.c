@@ -57,6 +57,11 @@
 extern char **environ;
 #endif
 
+#ifdef DBUS_OS2
+#include <sys/socket.h>
+#define pipe(A) socketpair(AF_UNIX, SOCK_STREAM, 0, A)
+#endif
+
 /**
  * @addtogroup DBusInternalsUtils
  * @{
@@ -938,6 +943,7 @@ make_pipe (int         p[2],
 #endif
     {
       retval = pipe(p);
+
     }
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);

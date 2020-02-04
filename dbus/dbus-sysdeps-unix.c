@@ -24,7 +24,7 @@
 
 #include <config.h>
 
-#ifdef __OS2__
+#ifdef DBUS_OS2
 #define OS2EMX_PLAIN_CHAR
 #define INCL_BASE
 #define INCL_PM
@@ -111,6 +111,10 @@
 
 #ifndef HAVE_SOCKLEN_T
 #define socklen_t int
+#endif
+
+#ifdef DBUS_OS2
+#define pipe(A) socketpair(AF_UNIX, SOCK_STREAM, 0, A)
 #endif
 
 #if defined (__sun) || defined (__sun__)
