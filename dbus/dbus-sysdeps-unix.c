@@ -942,6 +942,15 @@ _dbus_connect_unix_socket (const char     *path,
 
   _DBUS_ZERO (addr);
   addr.sun_family = AF_UNIX;
+#ifdef __OS2__
+  /* we need \socket\anything, so change / to \ */
+  char *p;
+  for (p = path; *p; p++)
+  {
+    if (*p == '/')
+      *p = '\\';
+  }
+#endif
   path_len = strlen (path);
 
   if (abstract)
@@ -980,7 +989,11 @@ _dbus_connect_unix_socket (const char     *path,
       strncpy (addr.sun_path, path, sizeof (addr.sun_path) - 1);
     }
 
+#ifdef __OS2__
+  if (connect (fd, (struct sockaddr*) &addr, sizeof(struct sockaddr_un)) < 0)
+#else
   if (connect (fd, (struct sockaddr*) &addr, _DBUS_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
+#endif
     {
       dbus_set_error (error,
                       _dbus_error_from_errno (errno),
@@ -1149,6 +1162,15 @@ _dbus_listen_unix_socket (const char     *path,
 
   _DBUS_ZERO (addr);
   addr.sun_family = AF_UNIX;
+#ifdef __OS2__
+  /* we need \socket\anything, so change / to \ */
+  char *p;
+  for (p = path; *p; p++)
+  {
+    if (*p == '/')
+      *p = '\\';
+  }
+#endif
   path_len = strlen (path);
 
   if (abstract)
@@ -1208,7 +1230,11 @@ _dbus_listen_unix_socket (const char     *path,
       strncpy (addr.sun_path, path, sizeof (addr.sun_path) - 1);
     }
 
+#ifdef __OS2__
+  if (bind (listen_fd, (struct sockaddr*) &addr, sizeof(struct sockaddr_un)) < 0)
+#else
   if (bind (listen_fd, (struct sockaddr*) &addr, _DBUS_STRUCT_OFFSET (struct sockaddr_un, sun_path) + path_len) < 0)
+#endif
     {
       dbus_set_error (error, _dbus_error_from_errno (errno),
                       "Failed to bind socket \"%s\": %s",
@@ -1236,8 +1262,10 @@ _dbus_listen_unix_socket (const char     *path,
   /* Try opening up the permissions, but if we can't, just go ahead
    * and continue, maybe it will be good enough.
    */
+#ifndef __OS2__ // not a real file for us
   if (!abstract && chmod (path, 0777) < 0)
     _dbus_warn ("Could not set mode 0777 on socket %s", path);
+#endif
 
   return listen_fd;
 }
@@ -3927,7 +3955,11 @@ _dbus_get_tmpdir(void)
 
       /* And this is the sane fallback. */
       if (tmpdir == NULL)
+#ifdef __OS2__
+        tmpdir = "/@unixroot/var/tmp";
+#else
         tmpdir = "/tmp";
+#endif
     }
 
   _DBUS_UNLOCK (sysdeps);
