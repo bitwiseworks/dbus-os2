@@ -465,6 +465,7 @@ _dbus_rlimit_raise_fd_limit (DBusError *error)
       lim.rlim_cur == old.rlim_cur)
     return TRUE;
 
+#ifndef __OS2__
   if (setrlimit (RLIMIT_NOFILE, &lim) < 0)
     {
       dbus_set_error (error, _dbus_error_from_errno (errno),
@@ -473,6 +474,7 @@ _dbus_rlimit_raise_fd_limit (DBusError *error)
                       _dbus_strerror (errno));
       return FALSE;
     }
+#endif
 
   return TRUE;
 }
