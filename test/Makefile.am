@@ -362,7 +362,7 @@ installable_test_meta_with_config = \
 installcheck_tests =
 installcheck_environment = \
 	export XDG_DATA_HOME=@abs_top_builddir@/test/XDG_DATA_HOME; \
-	export XDG_DATA_DIRS=@abs_top_builddir@/test/XDG_DATA_DIRS:$(DESTDIR)$(datadir); \
+	export XDG_DATA_DIRS="@abs_top_builddir@/test/XDG_DATA_DIRS$(PATH_SEPARATOR)$(DESTDIR)$(datadir)"; \
 	export XDG_RUNTIME_DIR=@abs_top_builddir@/test/XDG_RUNTIME_DIR; \
 	export DBUS_SESSION_BUS_ADDRESS=do-not-use-real-session:; \
 	export DBUS_TEST_DAEMON=$(DESTDIR)$(DBUS_DAEMONDIR)/dbus-daemon$(EXEEXT); \
@@ -381,7 +381,7 @@ installcheck_environment = \
 # DBUS_TEST_BUILDDIR.
 AM_TESTS_ENVIRONMENT = \
 	export XDG_DATA_HOME=@abs_top_builddir@/test/XDG_DATA_HOME; \
-	export XDG_DATA_DIRS=@abs_top_builddir@/test/XDG_DATA_DIRS:@abs_top_builddir@/test/XDG_DATA_DIRS2; \
+	export XDG_DATA_DIRS="@abs_top_builddir@/test/XDG_DATA_DIRS$(PATH_SEPARATOR)@abs_top_builddir@/test/XDG_DATA_DIRS2"; \
 	export XDG_RUNTIME_DIR=@abs_top_builddir@/test/XDG_RUNTIME_DIR; \
 	export DBUS_FATAL_WARNINGS=1; \
 	export DBUS_SESSION_BUS_ADDRESS=do-not-use-real-session:; \
