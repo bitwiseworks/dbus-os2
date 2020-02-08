@@ -1111,6 +1111,9 @@ fi
 AC_SUBST([ADT_LIBS])
 
 # Check for SCM_RIGHTS
+# @todo do we need that?
+# this part is not ported, so disable it
+if !test x$dbus_os2 = xyes ; then
 AC_MSG_CHECKING([for SCM_RIGHTS])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/types.h>
@@ -1121,6 +1124,7 @@ static int x = SCM_RIGHTS;
 [ AC_MSG_RESULT([supported])
   AC_DEFINE([HAVE_UNIX_FD_PASSING], [1], [Supports sending UNIX file descriptors]) ],
 [ AC_MSG_RESULT([not supported]) ])
+fi
 
 NETWORK_libs=
 if test x$dbus_win = xyes ; then
