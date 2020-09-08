@@ -1113,7 +1113,7 @@ AC_SUBST([ADT_LIBS])
 # Check for SCM_RIGHTS
 # @todo do we need that?
 # this part is not ported, so disable it
-if !test x$dbus_os2 = xyes ; then
+if test x$dbus_os2 != xyes ; then
 AC_MSG_CHECKING([for SCM_RIGHTS])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/types.h>
