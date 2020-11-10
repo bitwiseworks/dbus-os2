@@ -300,6 +300,10 @@ libdbus_1_la_LDFLAGS = \
 	-no-undefined \
 	$(NULL)
 
+if DBUS_OS2
+libdbus_1_la_LDFLAGS += -shortname dbus1
+endif
+
 libdbus_internal_la_LIBADD = \
 	$(CODE_COVERAGE_LIBS) \
 	$(LIBDBUS_LIBS) \
