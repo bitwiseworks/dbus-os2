@@ -1417,10 +1417,14 @@ AC_SUBST([systemduserunitdir], [$with_systemduserunitdir])
 if ! test -z "$with_system_socket"; then
    DBUS_SYSTEM_SOCKET=$with_system_socket
 else
+if test "x$dbus_os2" = xyes; then
+   DBUS_SYSTEM_SOCKET=/socket/dbus_system_bus_socket
+else
    # We don't use runstatedir for this (yet?), because /var/run has been the
    # interoperable system bus socket for 10+ years.
    # See https://bugs.freedesktop.org/show_bug.cgi?id=101628
    DBUS_SYSTEM_SOCKET=${EXPANDED_LOCALSTATEDIR}/run/dbus/system_bus_socket
+fi
 fi
 
 AC_SUBST(DBUS_SYSTEM_SOCKET)
