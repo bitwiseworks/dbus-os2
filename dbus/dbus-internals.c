@@ -321,7 +321,7 @@ _dbus_verbose_init (void)
  * 
  * @todo move to a header file so that others can use this too
  */
-#ifdef DBUS_WIN 
+#if defined(DBUS_WIN) || defined(DBUS_OS2)
 #define DBUS_IS_DIR_SEPARATOR(c) (c == '\\' || c == '/')
 #else
 #define DBUS_IS_DIR_SEPARATOR(c) (c == '/')
