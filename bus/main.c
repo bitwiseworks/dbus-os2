@@ -108,6 +108,9 @@ signal_handler (int sig)
       break;
 
     case SIGTERM:
+#ifdef DBUS_OS2
+    case SIGINT:
+#endif
       {
         DBusString str;
         char action[2] = { ACTION_QUIT, '\0' };
@@ -719,6 +722,11 @@ main (int argc, char **argv)
 
   _dbus_set_signal_handler (SIGTERM, signal_handler);
   _dbus_set_signal_handler (SIGHUP, signal_handler);
+
+#ifdef DBUS_OS2 // handle ctrl-c as well
+  _dbus_set_signal_handler (SIGINT, signal_handler);
+#endif
+
 #endif /* DBUS_UNIX */
 
   _dbus_verbose ("We are on D-Bus...\n");
