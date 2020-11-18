@@ -1132,6 +1132,9 @@ handle_server_data_external_mech (DBusAuth         *auth,
 
   _dbus_credentials_clear (auth->desired_identity);
   
+#ifdef DBUS_OS2
+  _dbus_string_set_length(&auth->identity, 0);
+#endif
   /* If auth->identity is still empty here, then client
    * responded with an empty string after we poked it for
    * an initial response. This means to try to auth the
