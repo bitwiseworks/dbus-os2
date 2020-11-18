@@ -1132,7 +1132,7 @@ handle_server_data_external_mech (DBusAuth         *auth,
 
   _dbus_credentials_clear (auth->desired_identity);
   
-#ifdef DBUS_OS2
+#ifdef DBUS_OS2 // init the identity, so both credentials are the same in the end
   _dbus_string_set_length(&auth->identity, 0);
 #endif
   /* If auth->identity is still empty here, then client
