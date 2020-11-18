@@ -46,7 +46,7 @@
 #include <dbus/dbus-internals.h>
 #include <dbus/dbus-server-protected.h>
 
-#ifdef DBUS_CYGWIN
+#if defined(DBUS_CYGWIN) || defined(DBUS_OS2)
 #include <signal.h>
 #endif
 
@@ -358,7 +358,7 @@ process_config_first_time_only (BusContext       *context,
 
       if (_dbus_stat (&u, &stbuf, NULL))
         {
-#ifdef DBUS_CYGWIN
+#if defined(DBUS_CYGWIN) || defined(DBUS_OS2)
           DBusString p;
           long /* int */ pid;
 
@@ -378,7 +378,7 @@ process_config_first_time_only (BusContext       *context,
 		                  "The pid file \"%s\" exists, if the message bus is not running, remove this file",
                           pidfile);
 	      goto failed;
-#ifdef DBUS_CYGWIN
+#if defined(DBUS_CYGWIN) || defined(DBUS_OS2)
           }
 #endif
         }
