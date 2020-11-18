@@ -465,7 +465,7 @@ _dbus_rlimit_raise_fd_limit (DBusError *error)
       lim.rlim_cur == old.rlim_cur)
     return TRUE;
 
-#ifndef __OS2__
+#ifndef DBUS_OS2
   if (setrlimit (RLIMIT_NOFILE, &lim) < 0)
     {
       dbus_set_error (error, _dbus_error_from_errno (errno),
@@ -483,6 +483,7 @@ dbus_bool_t
 _dbus_rlimit_restore_fd_limit (DBusRLimit *saved,
                                DBusError  *error)
 {
+#ifndef DBUS_OS2
   if (setrlimit (RLIMIT_NOFILE, &saved->lim) < 0)
     {
       dbus_set_error (error, _dbus_error_from_errno (errno),
@@ -490,6 +491,7 @@ _dbus_rlimit_restore_fd_limit (DBusRLimit *saved,
                       _dbus_strerror (errno));
       return FALSE;
     }
+#endif
 
   return TRUE;
 }
